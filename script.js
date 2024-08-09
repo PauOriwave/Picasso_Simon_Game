@@ -1,79 +1,93 @@
-const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
+const shapes = [
+    { id: 'shape1', color: 'red', shape: 'circle' },
+    { id: 'shape2', color: 'green', shape: 'square' },
+    { id: 'shape3', color: 'blue', shape: 'triangle' },
+    { id: 'shape4', color: 'yellow', shape: 'pentagon' }
+];
+
 let sequence = [];
-let userSequence = [];
-let level = 0;
-let userTurn = false;
+let playerSequence = [];
+let level = 1;
+let isPlaying = false;
 
-// Referencias a los elementos DOM
-const shapes = document.querySelectorAll('.shape');
-const message = document.getElementById('message');
-const startButton = document.getElementById('start');
+document.getElementById('start').addEventListener('click', startGame);
 
-// Genera una secuencia aleatoria
-function generateSequence() {
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    sequence.push(randomColor);
-    userSequence = [];
-    userTurn = false;
-    message.textContent = `Nivel ${level}`;
-    showSequence();
+function startGame() {
+    if (!isPlaying) {
+        isPlaying = true;
+        level = 1;
+        sequence = [];
+        playerSequence = [];
+        addShapeToSequence();
+        showSequence();
+    }
 }
 
-// Muestra la secuencia al usuario
+function addShapeToSequence() {
+    const shape = shapes[Math.floor(Math.random() * shapes.length)];
+    sequence.push(shape);
+}
+
 function showSequence() {
-    let index = 0;
-    const interval = setInterval(() => {
-        if (index >= sequence.length) {
-            clearInterval(interval);
-            userTurn = true;
-            return;
-        }
-        flashColor(sequence[index]);
-        index++;
-    }, 1000);
-}
+    let delay = 0;
+    sequence.forEach((shape, index) => {
+        setTimeout(() => {
+            highlightShape(shape.id);
+        }, delay);
+        delay += 1000;
+        setTimeout(() => {
+            unhighlightShape(shape.id);
+        }, delay);
+        delay += 500;
+    });
 
-// Hace parpadear un color
-function flashColor(color) {
-    const shape = document.getElementById(color);
-    shape.classList.add('active');
     setTimeout(() => {
-        shape.classList.remove('active');
-    }, 500);
+        playerSequence = [];
+        shapes.forEach(shape => {
+            document.getElementById(shape.id).addEventListener('click', handleShapeClick);
+        });
+    }, delay);
 }
 
-// Maneja el clic en un segmento de color
-function handleColorClick(color) {
-    if (userTurn) {
-        userSequence.push(color);
-        flashColor(color);
-        checkSequence();
-    }
+function highlightShape(id) {
+    const shape = document.getElementById(id);
+    shape.style.backgroundColor = '#fff';
 }
 
-// Verifica si la secuencia del usuario es correcta
-function checkSequence() {
-    for (let i = 0; i < userSequence.length; i++) {
-        if (userSequence[i] !== sequence[i]) {
-            message.textContent = '¡Perdiste! Presiona "Iniciar Juego" para volver a intentarlo.';
-            return;
+function unhighlightShape(id) {
+    const shape = document.getElementById(id);
+    const shapeData = shapes.find(s => s.id === id);
+    shape.style.backgroundColor = shapeData.color;
+}
+
+function handleShapeClick(event) {
+    const id = event.target.id;
+    const shape = shapes.find(s => s.id === id);
+    playerSequence.push(shape);
+
+    highlightShape(id);
+
+    if (checkSequence()) {
+        if (playerSequence.length === sequence.length) {
+            setTimeout(() => {
+                level++;
+                addShapeToSequence();
+                showSequence();
+            }, 1000);
         }
-    }
-    if (userSequence.length === sequence.length) {
-        level++;
-        setTimeout(generateSequence, 1000);
+    } else {
+        endGame();
     }
 }
 
-// Asigna eventos a los segmentos de color
-shapes.forEach(shape => {
-    shape.addEventListener('click', () => handleColorClick(shape.id));
-});
+function checkSequence() {
+    return playerSequence.every((shape, index) => shape.id === sequence[index].id);
+}
 
-// Inicia el juego al hacer clic en el botón de inicio
-startButton.addEventListener('click', () => {
-    sequence = [];
-    level = 0;
-    message.textContent = 'Nivel 0';
-    generateSequence();
-});
+function endGame() {
+    isPlaying = false;
+    document.getElementById('message').textContent = `¡Juego terminado! Alcanzaste el nivel ${level}`;
+    shapes.forEach(shape => {
+        document.getElementById(shape.id).removeEventListener('click', handleShapeClick);
+    });
+}
