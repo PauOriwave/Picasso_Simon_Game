@@ -11,6 +11,8 @@ let level = 1;
 let isPlaying = false;
 
 document.getElementById('start').addEventListener('click', startGame);
+document.getElementById('restart').addEventListener('click', restartGame);
+
 
 function startGame() {
     if (!isPlaying) {
@@ -21,6 +23,17 @@ function startGame() {
         addShapeToSequence();
         showSequence();
     }
+}
+function restartGame() {
+    isPlaying = false;
+    level = 1;
+    sequence = [];
+    playerSequence = [];
+    document.getElementById('message').textContent = '¡Haz clic en "Comenzar" para jugar!';
+    shapes.forEach(shape => {
+        document.getElementById(shape.id).removeEventListener('click', handleShapeClick);
+    });
+    document.getElementById('start').style.display = 'inline-block'; // Muestra el botón de "Comenzar"
 }
 
 function addShapeToSequence() {
@@ -76,12 +89,11 @@ function handleShapeClick(event) {
             }, 1000);
         }
     } else {
-        endGame();
+        event.target.style.backgroundColor = 'red'; // Resaltar en rojo si la respuesta es incorrecta
+        setTimeout(() => {
+            endGame();
+        }, 500);
     }
-}
-
-function checkSequence() {
-    return playerSequence.every((shape, index) => shape.id === sequence[index].id);
 }
 
 function endGame() {
