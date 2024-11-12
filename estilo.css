@@ -9,32 +9,55 @@ body {
 }
 
 #game {
-    display: flex;
-    flex-wrap: wrap;
-    width: 400px;
-    height: 400px;
+    display: grid;
+    grid-template-columns: repeat(2, 150px);
+    grid-template-rows: repeat(2, 150px);
+    gap: 10px;
+    width: 320px;
+    height: 320px;
     position: relative;
 }
 
 .shape {
-    width: 150px;
-    height: 150px;
-    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     opacity: 0.7;
+    cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
+/* Estilo para cuando el usuario hace clic sobre una forma */
 .shape:hover {
-    cursor: pointer;
     transform: scale(1.1);
 }
 
-#shape1 { background-color: red; border-radius: 50%; }
-#shape2 { background-color: green; }
-#shape3 { background-color: blue; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); }
-#shape4 { background-color: yellow; clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+/* Definir las formas abstractas inspiradas en Picasso */
+#shape1 { 
+    background-color: red; 
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}  /* Triángulo */
 
-#start {
+#shape2 { 
+    background-color: green; 
+    border-radius: 50%; /* Círculo */
+} 
+
+#shape3 { 
+    background-color: blue; 
+    clip-path: polygon(50% 0%, 100% 40%, 80% 100%, 20% 100%, 0% 40%); 
+} /* Pentágono */
+
+#shape4 { 
+    background-color: yellow; 
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%); 
+} /* Cuadrado, pero con esquinas suavizadas */
+
+/* Botones */
+#start, #restart {
     position: absolute;
     bottom: 10px;
     left: 50%;
@@ -46,6 +69,10 @@ body {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#start:hover, #restart:hover {
+    background-color: #45a049;
 }
 
 #message {
